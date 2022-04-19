@@ -158,9 +158,9 @@ Alexa Orrico - [Github](https://github.com/alexaorrico) / [Twitter](https://twit
 
 Jennifer Huang - [Github](https://github.com/jhuang10123) / [Twitter](https://twitter.com/earthtojhuang)
 
-Ojo Timilehin Joseph - [Github](https://github.com/Timex19) / [Twitter](https://twitter.com/TimexBadest)
+Sentayehu Tilahun  - [Github](https://github.com/sentayehut)  
 
-Eba Mengistu Baisa - [Github](https://github.com/EbaMengistu1) / [Twitter](https://twitter.com/Eba_Mengistu)
+Senait Alemayehu - [Github](https://github.com/seni7) 
 
 Second part of Airbnb: Joann Vuong
 ## License
