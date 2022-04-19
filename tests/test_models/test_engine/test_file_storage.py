@@ -1,171 +1,91 @@
 #!/usr/bin/python3
-"""
-Contains the TestFileStorageDocs classes
-"""
-
-from datetime import datetime
-import inspect
-import models
-from models.engine import file_storage
-from models.amenity import Amenity
-from models.base_model import BaseModel
-from models.city import City
-from models.place import Place
-from models.review import Review
-from models.state import State
-from models.user import User
-import json
-import os
-import pep8
+"""unittest for filestorage"""
 import unittest
-FileStorage = file_storage.FileStorage
-classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
-           "Place": Place, "Review": Review, "State": State, "User": User}
-
-
-class TestFileStorageDocs(unittest.TestCase):
-    """Tests to check the documentation and style of FileStorage class"""
-    @classmethod
-    def setUpClass(cls):
-        """Set up for the doc tests"""
-        cls.fs_f = inspect.getmembers(FileStorage, inspect.isfunction)
-
-    def test_pep8_conformance_file_storage(self):
-        """Test that models/engine/file_storage.py conforms to PEP8."""
-        pep8s = pep8.StyleGuide(quiet=True)
-        result = pep8s.check_files(['models/engine/file_storage.py'])
-        self.assertEqual(result.total_errors, 0,
-                         "Found code style errors (and warnings).")
-
-    def test_pep8_conformance_test_file_storage(self):
-        """Test tests/test_models/test_file_storage.py conforms to PEP8."""
-        pep8s = pep8.StyleGuide(quiet=True)
-        result = pep8s.check_files(['tests/test_models/test_engine/\
-test_file_storage.py'])
-        self.assertEqual(result.total_errors, 0,
-                         "Found code style errors (and warnings).")
-
-    def test_file_storage_module_docstring(self):
-        """Test for the file_storage.py module docstring"""
-        self.assertIsNot(file_storage.__doc__, None,
-                         "file_storage.py needs a docstring")
-        self.assertTrue(len(file_storage.__doc__) >= 1,
-                        "file_storage.py needs a docstring")
-
-    def test_file_storage_class_docstring(self):
-        """Test for the FileStorage class docstring"""
-        self.assertIsNot(FileStorage.__doc__, None,
-                         "FileStorage class needs a docstring")
-        self.assertTrue(len(FileStorage.__doc__) >= 1,
-                        "FileStorage class needs a docstring")
-
-    def test_fs_func_docstrings(self):
-        """Test for the presence of docstrings in FileStorage methods"""
-        for func in self.fs_f:
-            self.assertIsNot(func[1].__doc__, None,
-                             "{:s} method needs a docstring".format(func[0]))
-            self.assertTrue(len(func[1].__doc__) >= 1,
-                            "{:s} method needs a docstring".format(func[0]))
+import os
+import json
+from models.engine.file_storage import FileStorage
+from models.base_model import BaseModel
+from models.user import User
+from models.place import Place
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.review import Review
 
 
 class TestFileStorage(unittest.TestCase):
-    """Test the FileStorage class"""
-    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
-    def test_all_returns_dict(self):
-        """Test that all returns the FileStorage.__objects attr"""
-        storage = FileStorage()
-        new_dict = storage.all()
-        self.assertEqual(type(new_dict), dict)
-        self.assertIs(new_dict, storage._FileStorage__objects)
+    """class to test FileSTorage"""
+    def test_class_variables(self):
+        """class var test"""
+        fs1 = FileStorage()
+        list_app = []
+        if os.path.exists('file.json'):
+            os.remove('file.json')
+        for exists in fs1.all().keys():
+            list_app.append(fs1.all()[exists])
+        for exists in list_app:
+            del fs1.all()[exists.__class__.__name__ + '.' + exists.id]
 
-    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+        self.assertFalse(hasattr(FileStorage, '__file_path'))
+        self.assertFalse(hasattr(FileStorage, '__objects'))
+        self.assertFalse(hasattr(fs1, '__file_path'))
+        self.assertFalse(hasattr(fs1, '__objects'))
+        del fs1
+        if os.path.exists('file.json'):
+            print('file still exists')
+            os.remove('file.json')
+
+    def test_all(self):
+        """test all"""
+        fs2 = FileStorage()
+        list_app = []
+        if os.path.exists('file.json'):
+            os.remove('file.json')
+        for exists in fs2.all().keys():
+            list_app.append(fs2.all()[exists])
+        for exists in list_app:
+            del fs2.all()[exists.__class__.__name__ + '.' + exists.id]
+
+        self.assertIsInstance(fs2.all(), dict)
+        self.assertEqual(fs2.all(), {})
+        bm1, bm2 = BaseModel(), BaseModel()
+        fs2.new(bm1)
+        fs2.new(bm2)
+        self.assertEqual(fs2.all(), {'BaseModel.' + bm1.id : bm1,
+                                     'BaseModel.' + bm2.id : bm2})
+
+        del bm1, bm2, fs2
+
     def test_new(self):
-        """test that new adds an object to the FileStorage.__objects attr"""
-        storage = FileStorage()
-        save = FileStorage._FileStorage__objects
-        FileStorage._FileStorage__objects = {}
-        test_dict = {}
-        for key, value in classes.items():
-            with self.subTest(key=key, value=value):
-                instance = value()
-                instance_key = instance.__class__.__name__ + "." + instance.id
-                storage.new(instance)
-                test_dict[instance_key] = instance
-                self.assertEqual(test_dict, storage._FileStorage__objects)
-        FileStorage._FileStorage__objects = save
+        """ test new """
+        dic = {"id": "8d8b4200-z106-469d-aec9-70zae1224150",
+               "__class__": "BaseModel",
+               "updated_at": "2020-07-01T16:47:21.260793",
+               "created_at": "2020-07-01T16:47:21.260752"}
+        fs3 = FileStorage()
+        list_app = []
+        if os.path.exists('file.json'):
+            os.remove('file.json')
+        for exists in fs3.all().keys():
+            list_app.append(fs3.all()[exists])
+        for exists in list_app:
+            del fs3.all()[exists.__class__.__name__ + '.' + exists.id]
+        classes = [Amenity(**dic), BaseModel(**dic), City(**dic), Place(**dic),
+                   Review(**dic), State(**dic), User(**dic)]
 
-    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
-    def test_save(self):
-        """Test that save properly saves objects to file.json"""
-        storage = FileStorage()
-        new_dict = {}
-        for key, value in classes.items():
-            instance = value()
-            instance_key = instance.__class__.__name__ + "." + instance.id
-            new_dict[instance_key] = instance
-        save = FileStorage._FileStorage__objects
-        FileStorage._FileStorage__objects = new_dict
-        storage.save()
-        FileStorage._FileStorage__objects = save
-        for key, value in new_dict.items():
-            new_dict[key] = value.to_dict()
-        string = json.dumps(new_dict)
-        with open("file.json", "r") as f:
-            js = f.read()
-        self.assertEqual(json.loads(string), json.loads(js))
+        for cls in classes:
+            fs3.new(cls)
+            self.assertIn(cls.__class__.__name__ + '.' + cls.id,
+                          fs3.all())
 
-    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
-    def test_get_no_class(self):
-        """ test get with a non existing class
-        """
-        storage = FileStorage()
-        one = storage.get("NO", "09231280jdodasd")
-        self.assertEqual(one, None)
+        for cls in classes:
+            name = cls.__class__.__name__
+            self.assertTrue(name + '.' + cls.id in fs3.all().keys())
 
-    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
-    def test_get_class_no_id(self):
-        """ test get if a class id doesn´t exist
-        """
-        storage = FileStorage()
-        one = storage.get("State", "09231280jdodasd")
-        self.assertEqual(one, None)
+        for i in range(len(fs3.all().keys())):
+            self.assertIn(fs3.all()[list(fs3.all().keys())[i]],
+                          classes)
+        for exists in classes:
+            del exists
+        del fs3
 
-    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
-    def test_get(self):
-        """ test get return
-        """
-        storage = FileStorage()
-        first_elem = list(storage.all("State").values())[0]
-        first_state_id = first_elem.id
-        one = storage.get("State", first_state_id)
-        self.assertEqual(one, first_elem)
-
-    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
-    def test_count_no_class(self):
-        """ test count is no class
-        """
-        storage = FileStorage()
-        counter = 0
-        dic = storage.all()
-        for elem in dic:
-            counter = counter + 1
-        self.assertEqual(counter, storage.count())
-
-    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
-    def test_count_fail(self):
-        """ test count if no valid class
-        """
-        storage = FileStorage()
-        counter = 0
-        self.assertEqual(counter, storage.count("NO_CLASS"))
-
-    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
-    def test_count(self):
-        """ test count with class user
-        """
-        storage = FileStorage()
-        counter = 0
-        dic = storage.all("User")
-        for elem in dic:
-            counter = counter + 1
-        self.assertEqual(counter, storage.count("User"))
